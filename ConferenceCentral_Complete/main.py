@@ -38,7 +38,7 @@ class SendConfirmationEmailHandler(webapp2.RequestHandler):
         )
         
 class StoreSpeakerInMemCacheHandler(webapp2.RequestHandler):
-      def get(self):
+      def post(self):
         """Set Announcement in Memcache."""
         #ConferenceApi._storeFeaturedSpeakerInMemCache(speaker)
        

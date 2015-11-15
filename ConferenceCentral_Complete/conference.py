@@ -91,6 +91,12 @@ SESSION_GET_REQUEST_SESSIONTYPE = endpoints.ResourceContainer(
     typeOfSession = messages.StringField(2),
 )
 
+SESSION_GET_REQUEST_SESSIONNAME = endpoints.ResourceContainer(
+    message_types.VoidMessage,
+    websafeConferenceKey=messages.StringField(1),
+    SessionName = messages.StringField(2),
+)
+
 CONF_POST_REQUEST = endpoints.ResourceContainer(
     ConferenceForm,
     websafeConferenceKey=messages.StringField(1),
@@ -183,23 +189,21 @@ class ConferenceApi(remote.Service):
                 SpeakerSessions.append(session.SessionName)
 
         if OtherSessionsInWhichSpeakerIsSpeaking >= 1:
-            self.speakerToMemCache(session.speaker, SpeakerSessions)
+            #self.speakerToMemCache(session.speaker, SpeakerSessions)
+            taskqueue.add(params={'speaker': session.speaker,
+                      'SpeakerSessions': SpeakerSessions},
+            url='/tasks/store_speaker_in_memcache'
+            #method = 'GET'         
+        )
 
         print "SpeakerSessions is", SpeakerSessions
         print "OtherSessionsInWhichSpeakerIsSpeaking", OtherSessionsInWhichSpeakerIsSpeaking
 
+        
+
         Session(**data).put()
         return request
    
-    def speakerToMemCache(self, speaker, SpeakerSessions = [], *args):
-        print "i am in speakerToCache"
-        print "SpeakerSessions is", SpeakerSessions
-        taskqueue.add(params={'speaker': speaker,
-                      'SpeakerSessions': SpeakerSessions},
-            url='/tasks/store_speaker_in_memcache',
-            method = 'GET'         
-        )
-
     def _createConferenceObject(self, request):
         """Create or update Conference object, returning ConferenceForm/request."""
         # preload necessary data items
@@ -392,6 +396,16 @@ class ConferenceApi(remote.Service):
             http_method='GET', name='getConferenceSessionsByType')
     def getConferenceSessionsByType(self, request):
         return self._getConferenceSessionsByType(request)
+
+    @endpoints.method(SESSION_GET_REQUEST_SESSIONNAME, SessionForms,
+            path='conference/{websafeConferenceKey}/session/{SessionName}',
+            http_method='GET', name='getConferenceSessionsBySessionName')
+    def getConferenceSessionBySessionName(self, request):
+        data = {field.name: getattr(request, field.name) for field in request.all_fields()}
+        sessionName = data['SessionName']
+        items = []
+        sessions = Session.query(Session.SessionName == sessionName)
+        return SessionForms(items=[self._copySessionToForm(session) for session in sessions])
 
     @endpoints.method(CONF_GET_REQUEST, ConferenceForm,
             path='conference/{websafeConferenceKey}',
@@ -614,7 +628,7 @@ class ConferenceApi(remote.Service):
 
 
     @staticmethod
-    def _storeFeaturedSpeakerInMemCache(speaker, SpeakerSessions = [], *args):
+    def _storeFeaturedSpeakerInMemCache(speaker, SpeakerSessions):
         print "I am in storeFeaturedSpeakerInMemCache"
         print "SpeakerSessions is", SpeakerSessions
         sessions = ""
