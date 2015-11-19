@@ -43,7 +43,7 @@ class StoreSpeakerInMemCacheHandler(webapp2.RequestHandler):
         #ConferenceApi._storeFeaturedSpeakerInMemCache(speaker)
        
         #ConferenceApi._storeFeaturedSpeakerInMemCache(self.request.get('speaker'), self.request.get('SpeakerSessions'))
-        ConferenceApi._storeFeaturedSpeakerInMemCache(self.request.get('speaker'), self.request.get('SpeakerSessions'))
+        ConferenceApi._storeFeaturedSpeakerInMemCache(self.request.get('speaker'), self.request.get('websafeConferenceKey'))
         self.response.set_status(204)
 
 app = webapp2.WSGIApplication([
