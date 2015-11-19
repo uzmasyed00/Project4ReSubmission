@@ -32,10 +32,13 @@ TypeOfSession has been defined as string so that user has flexibility as to what
 from a list of specified sessions in which case it would be of type EnumProperty.
 
 Date and time have been chosen as DateProperty and TimeProperty respectively to support queries that can be ordered/sorted by date and time.
+Task 2:
+addSessionToWishList - The input is a session form. Copy and paste the session key of the session from the datastore on localhost and add the sessionkey in the sessionkey field on the session form.
+getSessionFromWishList - Gets user's sessions from the wishlist.
 
 #Task 3 -  Additional queries
 The 2 additional queries are as follows:
-removeSessionFromUserWishList() - The user can remove any session that are there in the wish list. If the wish list is empty, there is nothing to remove and user is told there is nothing to remove. 
+removeSessionFromUserWishList() - The user can remove any session that are there in the wish list. Copy and paste the session key of the session from the datastore on localhost and add the sessionkey in the sessionkey field on the session form.
 
 getConferenceSessionBySessionName() - This query retrieves session based on SessionName provided. This can be useful if one needs to know details of a particular session.
 
